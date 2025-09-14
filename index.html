@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Page de veille</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: beige;
+      padding-top: 80px;
+    }
+    h1 {
+      color: grey;
+    }
+    h2 {
+      color: grey;
+      font-family: 'Times New Roman', Times, serif, sans-serif;
+    }
+    .abc {
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 30px rgb(147, 26, 26);
+      border: 2px solid rgb(147, 26, 26);
+      margin: 100px auto;
+      max-width: 600px;
+      background: #fff;
+    }
+    #countdown {
+      font-size: 2em;
+      margin-top: 30px;
+      color: rgb(147, 26, 26);
+    }
+    .grid-media {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-auto-rows: 200px;
+      gap: 15px;
+      margin: 30px 0;
+    }
+    .grid-media img,
+    .grid-media video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #aaa;
+    }
+    /* Modal styles */
+    #mediaModal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+    }
+    #modalImg, #modalVideo {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 10px;
+      display: none;
+      background: #000;
+    }
+    #closeModal, #prevMedia, #nextMedia {
+      position: absolute;
+      color: white;
+      font-size: 40px;
+      cursor: pointer;
+      user-select: none;
+    }
+    #closeModal { top: 20px; right: 40px; font-size: 40px; }
+    #prevMedia { top: 50%; left: 20px; font-size: 60px; }
+    #nextMedia { top: 50%; right: 20px; font-size: 60px; }
+    
+  </style>
+</head>
+<body>
+  <div class="abc" id="splash">
+    <h1>🚧 Cette page sera bientôt disponible !</h1>
+    <p>Ouverture prévue le <strong>15 septembre 2025 à 00h00</strong></p>
+    <div id="countdown"><span id="time"></span></div>
+  </div>
+
+  <div id="main" style="display: none;">
+    <main>
+      <section class="intro">
+        <h1>Joyeux Anniversaire Mujinga Kabuya Christelle</h1>
+        <h2>Les années passent, mais certaines vérités demeurent immuables.<br>
+        Depuis ton départ, je n'ai eu aucun cpa sur ce:<br>
+        Joyeux anniversaire ma CPA irremplaçable</h2>
+      </section>
+      <section class="photos">
+        <h2>Joyeux anniversaire à l'une des nôtres</h2>
+        <div class="grid-media">
+          <img src="collation.jpg" alt="collation">
+          <img src="soireee.jpg" alt="soireee">
+          <img src="gj.jpg" alt="gj">
+          <img src="cic.jpg" alt="cic">
+          <img src="souvenir.jpg" alt="souvenir">
+          <video controls src="aaa.mp4" preload="metadata"></video>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal pour images et vidéo -->
+  <div id="mediaModal">
+    <span id="closeModal">&times;</span>
+    <img id="modalImg" src="">
+    <video id="modalVideo" controls></video>
+    <div id="prevMedia">&#10094;</div>
+    <div id="nextMedia">&#10095;</div>
+  </div>
+
+  <script>
+    // Compte à rebours jusqu'au 15 septembre 2025 à 00h00 (heure locale)
+    const target = new Date(2025, 8, 15, 0, 0, 0);
+    const countdownEl = document.getElementById("time");
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = target - now;
+      if (diff <= 0) {
+        showUnlockedPage();
+      } else {
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((diff / (1000 * 60)) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+        countdownEl.textContent = `${d}j ${h}h ${m}m ${s}s`;
+      }
+    }
+    function showUnlockedPage() {
+      document.getElementById("splash").style.display = "none";
+      document.getElementById("main").style.display = "block";
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // Modal images/vidéo
+    const medias = Array.from(document.querySelectorAll('.grid-media img, .grid-media video'));
+    const modal = document.getElementById('mediaModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalVideo = document.getElementById('modalVideo');
+    let idx = 0;
+
+    medias.forEach((media, i) => {
+      media.onclick = () => { idx = i; showMedia(); };
+    });
+
+    function showMedia() {
+      modal.style.display = 'flex';
+      const media = medias[idx];
+      if (media.tagName === 'IMG') {
+        modalImg.src = media.src;
+        modalImg.style.display = 'block';
+        modalVideo.style.display = 'none';
+        modalVideo.pause();
+      } else if (media.tagName === 'VIDEO') {
+        modalVideo.src = media.src;
+        modalVideo.style.display = 'block';
+        modalImg.style.display = 'none';
+        modalVideo.currentTime = 0;
+        modalVideo.play();
+      }
+    }
+    document.getElementById('closeModal').onclick = () => {
+      modal.style.display = 'none';
+      modalVideo.pause();
+    };
+    document.getElementById('prevMedia').onclick = e => {
+      e.stopPropagation();
+      idx = (idx-1+medias.length)%medias.length;
+      showMedia();
+    };
+    document.getElementById('nextMedia').onclick = e => {
+      e.stopPropagation();
+      idx = (idx+1)%medias.length;
+      showMedia();
+    };
+    modal.onclick = e => { if(e.target===modal) { modal.style.display='none'; modalVideo.pause(); } };
+  </script>
+</body>
+</html>
